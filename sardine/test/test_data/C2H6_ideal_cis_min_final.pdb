@@ -1,0 +1,15 @@
+HEADER  Ethane (C2H6) idealized cis conformation   SCH 19 June 2013
+HEADER     produced by steepest descent minimization of C2H6_ideal_cis.pdb
+HEADER	   Coordinates at Step 51 of minimization
+HEADER     Step          Ebond         Eangle           Evdw           Etot
+HEADER       51        -0.2084         0.0208         0.0632        -0.1243 
+HEADER	Coordinates at Step 51
+ATOM      1    C   A A   1      -0.004  -0.000   0.000  0.00  1.00  12.0  1.75  0.00 
+ATOM      2    C   A A   1       1.544  -0.000   0.000  0.00  1.00  12.0  1.75  0.00 
+ATOM      3    H   A A   1      -0.349   0.939   0.000  0.00  1.00   1.0  1.75  0.00 
+ATOM      4    H   A A   1      -0.349  -0.470   0.813  0.00  1.00   1.0  1.75  0.00 
+ATOM      5    H   A A   1      -0.349  -0.470  -0.813  0.00  1.00   1.0  1.75  0.00 
+ATOM      6    H   A A   1       1.889   0.939   0.000  0.00  1.00   1.0  1.75  0.00 
+ATOM      7    H   A A   1       1.889  -0.470   0.813  0.00  1.00   1.0  1.75  0.00 
+ATOM      8    H   A A   1       1.889  -0.470  -0.813  0.00  1.00   1.0  1.75  0.00 
+END

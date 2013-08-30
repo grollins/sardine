@@ -1,0 +1,15 @@
+HEADER  Ethane (C2H6) idealized trans conformation   SCH 14 June 2013
+HEADER     produced by steepest descent minimization of C2H6_ideal_trans.pdb
+HEADER	   Coordinates at Step 56 of minimization
+HEADER     Step          Ebond         Eangle           Evdw           Etot
+HEADER       56        -0.6318         0.0042         0.0104        -0.6172 
+HEADER
+ATOM      1    C   A A   1      -0.002   0.000   0.000  0.00  1.00  12.0  1.75  0.00 
+ATOM      2    C   A A   1       1.542  -0.000   0.000  0.00  1.00  12.0  1.75  0.00 
+ATOM      3    H   A A   1      -0.340  -0.941   0.000  0.00  1.00   1.0  1.75  0.00 
+ATOM      4    H   A A   1      -0.340   0.471   0.815  0.00  1.00   1.0  1.75  0.00 
+ATOM      5    H   A A   1      -0.340   0.471  -0.815  0.00  1.00   1.0  1.75  0.00 
+ATOM      6    H   A A   1       1.880   0.941   0.000  0.00  1.00   1.0  1.75  0.00 
+ATOM      7    H   A A   1       1.880  -0.471   0.815  0.00  1.00   1.0  1.75  0.00 
+ATOM      8    H   A A   1       1.880  -0.471  -0.815  0.00  1.00   1.0  1.75  0.00 
+END

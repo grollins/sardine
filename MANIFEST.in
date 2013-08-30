@@ -1,0 +1,14 @@
+include MANIFEST.in
+include *.txt
+include *.rst
+# Top-level build script
+include setup.py
+# All source files
+recursive-include sardine *
+# All scripts
+recursive-include scripts *
+recursive-include examples *
+# Exclude what we don't want to include
+prune doc/build
+prune doc/source/generated
+global-exclude *.pyc *~ *.bak *.swp *.pyo
