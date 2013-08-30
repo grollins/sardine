@@ -1,6 +1,6 @@
 from collections import namedtuple
 from numpy import zeros
-from .util import compute_distance_matrix_from_vector
+from .util import compute_distance_vector, compute_distance_matrix_from_vector
 
 Bond = namedtuple("Bond", ['serial_num_1', 'serial_num_2', 'force_const', 'r_0'])
 
@@ -47,8 +47,10 @@ class EnergyFunctionFactory(object):
     def add_energy_term(self, term_name, term_func):
         self.energy_terms[term_name] = term_func
 
-    def create_energy_func(self, term_names):
-        def energy_func(D_vec):
+    def create_energy_func(self, term_names, num_atoms):
+        def energy_func(X_vec):
+            X = X_vec.reshape((num_atoms, 3))
+            D_vec = compute_distance_vector(X)
             D = compute_distance_matrix_from_vector(D_vec)
             E = 0.
             for t in term_names:

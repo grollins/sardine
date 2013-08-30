@@ -1,4 +1,4 @@
-from numpy import array, zeros, zeros_like, sqrt, diagflat
+from numpy import array, zeros, zeros_like, sqrt, diagflat, repeat
 from collections import namedtuple
 
 Atom = namedtuple("Atom", ['x', 'y', 'z', 'mass', 'charge', 'radius',
@@ -41,7 +41,7 @@ class Universe(object):
         self.coord_array = array(coords)
         self.charge_array = array(charges)
         self.radius_array = array(radii)
-        inv_sqrt_diag = 1./sqrt(self.mass_array)
+        inv_sqrt_diag = 1./sqrt( repeat(self.mass_array, 3) )
         self.M = diagflat(inv_sqrt_diag)
 
     def get_inv_sqrt_mass_matrix(self):
