@@ -1,4 +1,4 @@
 sardine
 =======
 
-simple molecular modeling
+simple small molecule normal mode analysis
