@@ -69,3 +69,4 @@ class TestTriatomicNMA(TestCase):
         mode_freqs = normal_modes.get_frequencies()
         self.assertTrue( allclose(mode_freqs, expected_mode_freqs),
                          msg="\n%s\n%s" % (mode_freqs, expected_mode_freqs) )
+        # print compute_normal_modes(F, discard_trans_and_rot=False)

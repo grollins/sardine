@@ -33,6 +33,9 @@ class NormalModes(object):
         self.frequencies = frequencies
         self.amplitudes = amplitudes
 
+    def __str__(self):
+        return "\n%s\n%s" % (self.frequencies, self.amplitudes)
+
     def get_mode(self, mode_num):
         return self.frequencies[mode_num], self.amplitudes[:,mode_num]
 
