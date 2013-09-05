@@ -1,6 +1,7 @@
 from unittest import TestCase
 from numpy import zeros, allclose
 from ..energy import BondEnergyFactory
+from ..bonded_terms import BondFactory
 
 class TestBondEnergy(TestCase):
     def setUp(self):
@@ -9,8 +10,10 @@ class TestBondEnergy(TestCase):
         r = 1.0
         num_atoms = 2
         self.expected_E = 0.5 * force_const * (r-r_0)**2
+        bf = BondFactory()
+        bond = bf.create_bond(1, 2, force_const, r_0)
         bef = BondEnergyFactory()
-        bef.add_term(1, 2, force_const, r_0)
+        bef.add_bond(bond)
         self.bond_energy_func = bef.create_func(num_atoms)
         D = zeros([num_atoms,num_atoms])
         D[0,1] = r

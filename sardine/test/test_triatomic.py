@@ -11,6 +11,9 @@ from ..energy import BondEnergyFactory, EnergyFunctionFactory
 from ..nma import compute_hessian, compute_force_constant_matrix,\
                   compute_normal_modes
 
+PDB_FILENAME = "sardine/test/test_data/triatomic.pdb"
+SF_FILENAME = "sardine/test/test_data/triatomic.sf"
+
 m1 = 1.0
 m2 = 1.0
 m3 = 1.0
@@ -18,18 +21,15 @@ k = 0.1
 r_0 = 1.0
 
 uf = UniverseFactory()
-uf.add_atom(x=-1., y=0, z=0, mass=m1, charge=0.0, radius=1.0, serial_num=1)
-uf.add_atom(x=0., y=0, z=0, mass=m2, charge=0.0, radius=1.0, serial_num=2)
-uf.add_atom(x=1., y=0, z=0, mass=m3, charge=0.0, radius=1.0, serial_num=3)
+uf.load_atoms_from_file(PDB_FILENAME)
 universe = uf.create_universe()
 
 bef = BondEnergyFactory()
-bef.add_term(1, 2, k, r_0)
-bef.add_term(2, 3, k, r_0)
-bond_energy_func = bef.create_func(num_atoms=3)
+bef.load_bonds_from_file(SF_FILENAME)
+bond_energy_func = bef.create_func(num_atoms=len(universe))
 eff = EnergyFunctionFactory()
 eff.add_energy_term('bonds', bond_energy_func)
-energy_func = eff.create_energy_func(['bonds'], num_atoms=3)
+energy_func = eff.create_energy_func(['bonds'], num_atoms=len(universe))
 
 H = zeros((9,9))
 H[0,0] = k
@@ -43,7 +43,8 @@ H[6,6] = k
 expected_H = H
 
 M_diag = array((m1, m2, m3))
-inv_sqrt_diag = 1./sqrt(repeat(M_diag, 3))
+num_spatial_dimensions = 3
+inv_sqrt_diag = 1./sqrt(repeat(M_diag, num_spatial_dimensions))
 expected_M = diagflat(inv_sqrt_diag)
 
 expected_F = dot( dot(expected_M, expected_H), expected_M )
