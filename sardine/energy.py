@@ -1,27 +1,24 @@
 from collections import namedtuple
 from numpy import zeros
 from .util import compute_distance_vector, compute_distance_matrix_from_vector
-
-Bond = namedtuple("Bond", ['serial_num_1', 'serial_num_2', 'force_const', 'r_0'])
+from .parsers import StructureParser
 
 class BondEnergyFactory(object):
     """docstring for BondEnergy"""
     def __init__(self):
         self.bonds = []
+        self.sf_parser = StructureParser()
 
-    def load_structure_file(self, structure_file):
-        with open(structure_file, 'r') as f:
-            for line in f:
-                word_list = line.split()
-                if word_list[0] == 'BOND':
-                    serial_num_1 = int(word_list[1])
-                    serial_num_2 = int(word_list[2])
-                    force_const = float(word_list[3])
-                    r_0 = float(word_list[4])
-                    self.add_term(serial_num_1, serial_num_2, force_const, r_0)
+    def add_bond(self, bond):
+        self.bonds.append( bond )
 
-    def add_term(self, serial_num_1, serial_num_2, force_const, r_0):
-        self.bonds.append( Bond(serial_num_1, serial_num_2, force_const, r_0) )
+    def load_bonds_from_file(self, filename):
+        if filename.endswith(".sf"):
+            for b in self.sf_parser.iter_bonds_in_sf_file(filename):
+                self.add_bond(b)
+        else:
+            print "Expected a .sf file, got %s" % filename
+            return
 
     def create_func(self, num_atoms):
         K = zeros([num_atoms, num_atoms])

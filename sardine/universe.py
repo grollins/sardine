@@ -1,27 +1,28 @@
 from numpy import array, zeros, zeros_like, sqrt, diagflat, repeat
-from collections import namedtuple
-
-Atom = namedtuple("Atom", ['x', 'y', 'z', 'mass', 'charge', 'radius',
-                           'serial_num', 'res_num', 'atom_name', 'res_name',
-                           'chain_id'])
-
+from .parsers import PdbParser
 
 class UniverseFactory(object):
     """docstring for UniverseFactory"""
     def __init__(self):
         self.atoms = []
+        self.pdb_parser = PdbParser()
 
-    def add_atom(self, x, y, z, mass, charge, radius, serial_num=None,
-                 res_num='1', atom_name='LJ', res_name='A', chain_id='A'):
+    def add_atom(self, atom):
         """docstring"""
-        serial_num = (len(self.atoms) if serial_num is None else serial_num)
-        self.atoms.append( Atom(x, y, z, mass, charge, radius,
-                                serial_num, res_num, atom_name, res_name,
-                                chain_id) )
+        if atom.serial_num is None:
+            atom.serial_num = len(self.atoms)
+        self.atoms.append(atom)
 
     def create_universe(self):
         return Universe(self.atoms)
 
+    def load_atoms_from_file(self, filename):
+        if filename.endswith(".pdb"):
+            for a in self.pdb_parser.iter_atoms_in_pdb_file(filename):
+                self.add_atom(a)
+        else:
+            print "Expected a .pdb file, got %s" % filename
+            return
 
 class Universe(object):
     """docstring for Universe"""
