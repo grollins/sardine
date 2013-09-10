@@ -17,9 +17,9 @@ class TestEthaneNMA(TestCase):
         uf.load_atoms_from_file(PDB_FILENAME)
         universe = uf.create_universe()
 
-        bef = BondEnergyFactory()
-        bef.load_bonds_from_file(SF_FILENAME)
-        bond_energy_func = bef.create_func(num_atoms=len(universe))
+        bond_energy = BondEnergyFactory()
+        bond_energy.load_bonds_from_file(SF_FILENAME)
+        bond_energy_func = bond_energy.create_energy_func(num_atoms=len(universe))
         eff = EnergyFunctionFactory()
         eff.add_energy_term('bonds', bond_energy_func)
         energy_func = eff.create_energy_func(
@@ -33,4 +33,4 @@ class TestEthaneNMA(TestCase):
         H = compute_hessian(self.energy_func, X)
         F = compute_force_constant_matrix(H, M)
         normal_modes = compute_normal_modes(F, discard_trans_and_rot=False)
-        print normal_modes
+        # print normal_modes

@@ -4,10 +4,14 @@ from .util import compute_distance_vector, compute_distance_matrix_from_vector
 from .parsers import StructureParser
 
 class BondEnergyFactory(object):
-    """docstring for BondEnergy"""
+    """docstring for BondEnergyFactory"""
     def __init__(self):
         self.bonds = []
         self.sf_parser = StructureParser()
+
+    def __iter__(self):
+        for b in self.bonds:
+            yield b
 
     def add_bond(self, bond):
         self.bonds.append( bond )
@@ -20,7 +24,7 @@ class BondEnergyFactory(object):
             print "Expected a .sf file, got %s" % filename
             return
 
-    def create_func(self, num_atoms):
+    def create_energy_func(self, num_atoms):
         K = zeros([num_atoms, num_atoms])
         R = zeros([num_atoms, num_atoms])
         for b in self.bonds:

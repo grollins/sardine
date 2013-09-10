@@ -3,13 +3,14 @@ Computes normal modes for a triatomic molecule and compares them to
 analytical results presented in
 Molecular Modeling: Principles and Applications by A.R. Leach, pg. 275 (2nd ed.)
 """
-
+from os.path import exists
 from unittest import TestCase
 from numpy import array, sqrt, dot, diagflat, allclose, zeros, repeat
 from ..universe import UniverseFactory
 from ..energy import BondEnergyFactory, EnergyFunctionFactory
 from ..nma import compute_hessian, compute_force_constant_matrix,\
-                  compute_normal_modes
+                  compute_normal_modes, generate_mode_trajectory
+from ..trajectory import save_trajectory_to_pdb
 
 PDB_FILENAME = "sardine/test/test_data/triatomic.pdb"
 SF_FILENAME = "sardine/test/test_data/triatomic.sf"
@@ -24,9 +25,9 @@ uf = UniverseFactory()
 uf.load_atoms_from_file(PDB_FILENAME)
 universe = uf.create_universe()
 
-bef = BondEnergyFactory()
-bef.load_bonds_from_file(SF_FILENAME)
-bond_energy_func = bef.create_func(num_atoms=len(universe))
+bond_energy = BondEnergyFactory()
+bond_energy.load_bonds_from_file(SF_FILENAME)
+bond_energy_func = bond_energy.create_energy_func(num_atoms=len(universe))
 eff = EnergyFunctionFactory()
 eff.add_energy_term('bonds', bond_energy_func)
 energy_func = eff.create_energy_func(['bonds'], num_atoms=len(universe))
@@ -69,4 +70,10 @@ class TestTriatomicNMA(TestCase):
         mode_freqs = normal_modes.get_frequencies()
         self.assertTrue( allclose(mode_freqs, expected_mode_freqs),
                          msg="\n%s\n%s" % (mode_freqs, expected_mode_freqs) )
-        # print compute_normal_modes(F, discard_trans_and_rot=False)
+
+        mode_trajectory = generate_mode_trajectory(universe, normal_modes,
+                                                   mode_number=0)
+        print len(mode_trajectory), "frames"
+        save_trajectory_to_pdb('triatomic_traj_mode0.pdb', mode_trajectory,
+                               universe, bond_energy)
+        self.assertTrue( exists('triatomic_traj_mode0.pdb') )

@@ -24,6 +24,7 @@ class UniverseFactory(object):
             print "Expected a .pdb file, got %s" % filename
             return
 
+
 class Universe(object):
     """docstring for Universe"""
     def __init__(self, atoms):
@@ -32,6 +33,10 @@ class Universe(object):
 
     def __len__(self):
         return len(self.atoms)
+
+    def __iter__(self):
+        for a in self.atoms:
+            yield a
 
     def initialize_matrices(self):
         masses = [a.mass for a in self.atoms]

@@ -12,9 +12,9 @@ class TestBondEnergy(TestCase):
         self.expected_E = 0.5 * force_const * (r-r_0)**2
         bf = BondFactory()
         bond = bf.create_bond(1, 2, force_const, r_0)
-        bef = BondEnergyFactory()
-        bef.add_bond(bond)
-        self.bond_energy_func = bef.create_func(num_atoms)
+        bond_energy = BondEnergyFactory()
+        bond_energy.add_bond(bond)
+        self.bond_energy_func = bond_energy.create_energy_func(num_atoms)
         D = zeros([num_atoms,num_atoms])
         D[0,1] = r
         D[1,0] = r
