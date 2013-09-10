@@ -1,6 +1,7 @@
 from collections import namedtuple
 from numpy import zeros
-from .util import compute_distance_vector, compute_distance_matrix_from_vector
+from .util import compute_distance_vector, compute_distance_matrix_from_vector,\
+                  compute_angle
 from .parsers import StructureParser
 
 class BondEnergyFactory(object):
@@ -8,6 +9,9 @@ class BondEnergyFactory(object):
     def __init__(self):
         self.bonds = []
         self.sf_parser = StructureParser()
+
+    def __len__(self):
+        return len(self.bonds)
 
     def __iter__(self):
         for b in self.bonds:
@@ -33,11 +37,51 @@ class BondEnergyFactory(object):
             K[i,j] = b.force_const
             R[i,j] = b.r_0
 
-        def bond_energy_func(D):
+        def bond_energy_func(X, D):
             E = 0.5 * K * (D - R)**2
             return E.sum()
 
         return bond_energy_func
+
+
+class AngleEnergyFactory(object):
+    """docstring for AngleEnergyFactory"""
+    def __init__(self):
+        super(AngleEnergyFactory, self).__init__()
+        self.angles = []
+        self.sf_parser = StructureParser()
+
+    def __len__(self):
+        return len(self.angles)
+
+    def __iter__(self):
+        for a in self.angles:
+            yield a
+
+    def add_angle(self, angle):
+        self.angles.append( angle )
+
+    def load_angles_from_file(self, filename):
+        if filename.endswith(".sf"):
+            for a in self.sf_parser.iter_angles_in_sf_file(filename):
+                self.add_angle(a)
+        else:
+            print "Expected a .sf file, got %s" % filename
+            return
+
+    def create_energy_func(self):
+        def angle_energy_func(X, D):
+            E = 0.0
+            for a in self.angles:
+                i = a.serial_num_1 - 1 # convert to 0-indexing
+                j = a.serial_num_2 - 1 # convert to 0-indexing
+                k = a.serial_num_3 - 1 # convert to 0-indexing
+                vec12 = X[i,:] - X[j,:]
+                vec32 = X[k,:] - X[j,:]
+                theta = compute_angle(vec12, vec32)
+                E += 0.5 * a.force_const * (theta - a.theta_0)**2
+            return E.sum()
+        return angle_energy_func
 
 
 class EnergyFunctionFactory(object):
@@ -55,6 +99,6 @@ class EnergyFunctionFactory(object):
             D = compute_distance_matrix_from_vector(D_vec)
             E = 0.
             for t in term_names:
-                E += self.energy_terms[t](D)
+                E += self.energy_terms[t](X, D)
             return E
         return energy_func

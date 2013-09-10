@@ -1,5 +1,5 @@
 from .atom import AtomFactory
-from .bonded_terms import BondFactory
+from .bonded_terms import BondFactory, AngleFactory
 
 class PdbParser(object):
     """
@@ -45,7 +45,7 @@ class StructureParser(object):
     def __init__(self):
         super(StructureParser, self).__init__()
         self.bond_factory = BondFactory()
-        # self.angle_factory = AngleFactory()
+        self.angle_factory = AngleFactory()
         # self.torsion_factory = TorsionFactory()
 
     def iter_bonds_in_sf_file(self, filename):
@@ -62,5 +62,24 @@ class StructureParser(object):
                                     serial_num_2=serial_num_2,
                                     force_const=force_const, r_0=r_0)
                     yield this_bond
+                else:
+                    continue
+
+    def iter_angles_in_sf_file(self, filename):
+        with open(filename, 'r') as f:
+            lines = [line.split() for line in f.readlines()]
+            for L in lines:
+                if L[0] == 'ANGLE':
+                    serial_num_1 = int(L[1])
+                    serial_num_2 = int(L[2])
+                    serial_num_3 = int(L[3])
+                    force_const = float(L[4])
+                    theta_0 = float(L[5])
+                    this_angle = self.angle_factory.create_angle(
+                                    serial_num_1=serial_num_1,
+                                    serial_num_2=serial_num_2,
+                                    serial_num_3=serial_num_3,
+                                    force_const=force_const, theta_0=theta_0)
+                    yield this_angle
                 else:
                     continue

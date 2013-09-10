@@ -4,7 +4,7 @@ Computes normal modes for ethane.
 
 from unittest import TestCase
 from ..universe import UniverseFactory
-from ..energy import BondEnergyFactory, EnergyFunctionFactory
+from ..energy import BondEnergyFactory, AngleEnergyFactory, EnergyFunctionFactory
 from ..nma import compute_hessian, compute_force_constant_matrix,\
                   compute_normal_modes
 
@@ -19,11 +19,19 @@ class TestEthaneNMA(TestCase):
 
         bond_energy = BondEnergyFactory()
         bond_energy.load_bonds_from_file(SF_FILENAME)
+        self.assertEqual( len(bond_energy), 7 )
         bond_energy_func = bond_energy.create_energy_func(num_atoms=len(universe))
+
+        angle_energy = AngleEnergyFactory()
+        angle_energy.load_angles_from_file(SF_FILENAME)
+        self.assertEqual( len(angle_energy), 12 )
+        angle_energy_func = angle_energy.create_energy_func()
+
         eff = EnergyFunctionFactory()
         eff.add_energy_term('bonds', bond_energy_func)
+        eff.add_energy_term('angles', angle_energy_func)
         energy_func = eff.create_energy_func(
-                        ['bonds'], num_atoms=len(universe))
+                        ['bonds', 'angles'], num_atoms=len(universe))
         self.universe = universe
         self.energy_func = energy_func
 
