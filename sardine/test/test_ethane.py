@@ -50,10 +50,13 @@ class TestEthaneNMA(TestCase):
         H = compute_hessian(self.energy_func, X)
         F = compute_force_constant_matrix(H, M)
         normal_modes = compute_normal_modes(F, discard_trans_and_rot=False)
-        # print normal_modes
-        mode_trajectory = generate_mode_trajectory(self.universe, normal_modes,
-                                                   mode_number=0)
-        print len(mode_trajectory), "frames"
-        save_trajectory_to_pdb('ethane_traj_mode0.pdb', mode_trajectory,
-                               self.universe, self.bond_energy)
-        self.assertTrue( exists('ethane_traj_mode0.pdb') )
+        mode_freqs = normal_modes.get_frequencies()
+        print mode_freqs
+        for i in xrange(len(mode_freqs)):
+            mode_trajectory = generate_mode_trajectory(self.universe, normal_modes,
+                                                       mode_number=i)
+            print len(mode_trajectory), "frames"
+            save_trajectory_to_pdb('ethane_traj_mode%02d.pdb' % (i+1),
+                                   mode_trajectory,
+                                   self.universe, self.bond_energy)
+            self.assertTrue( exists('ethane_traj_mode%02d.pdb' % (i+1)) )
