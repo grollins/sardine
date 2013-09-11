@@ -83,3 +83,14 @@ class StructureParser(object):
                     yield this_angle
                 else:
                     continue
+
+    def get_first_vdw_in_sf_file(self, filename):
+        with open(filename, 'r') as f:
+            lines = [line.split() for line in f.readlines()]
+            for L in lines:
+                if L[0] == 'VDW':
+                    well_distance = float(L[1])
+                    well_depth = float(L[2])
+                    return (well_distance, well_depth)
+                else:
+                    continue

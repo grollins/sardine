@@ -2,6 +2,8 @@ from numpy import arccos, radians, degrees, pi, dot, isnan, allclose, seterr
 from numpy.linalg import norm
 from scipy.spatial.distance import pdist, squareform
 
+# numpy complains when arg to arccos is out of bounds, but the
+# isnan conditional takes care of that, so we'll supress these warnings
 seterr(invalid='ignore')
 
 def compute_distance_vector(X):

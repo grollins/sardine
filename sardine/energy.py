@@ -1,8 +1,14 @@
 from collections import namedtuple
-from numpy import zeros
+from numpy import zeros, triu_indices, seterr
 from .util import compute_distance_vector, compute_distance_matrix_from_vector,\
                   compute_angle
 from .parsers import StructureParser
+
+# numpy complains about division by zero when computing vdw energy because
+# the distance matrix has zeros along the diagonal. We only include the terms
+# above the diagonal when computing the energy, so we'll suppress these
+# warnings.
+seterr(divide='ignore')
 
 class BondEnergyFactory(object):
     """docstring for BondEnergyFactory"""
@@ -82,6 +88,44 @@ class AngleEnergyFactory(object):
                 E += 0.5 * a.force_const * (theta - a.theta_0)**2
             return E.sum()
         return angle_energy_func
+
+
+class VDWEnergyFactory(object):
+    """docstring for VDWEnergyFactory"""
+    def __init__(self):
+        super(VDWEnergyFactory, self).__init__()
+        self.well_distance = 2.6 # angstroms
+        self.well_depth = 0.1 # kcal/mol
+        self.sf_parser = StructureParser()
+
+    def set_well_distance(self, well_distance):
+        self.well_distance = well_distance
+
+    def set_well_depth(self, well_depth):
+        self.well_depth = well_depth
+
+    def load_vdw_from_file(self, filename):
+        if filename.endswith(".sf"):
+            # take parameters from first VDW line encountered in file
+            distance, depth = self.sf_parser.get_first_vdw_in_sf_file(filename)
+            self.set_well_distance(distance)
+            self.set_well_depth(depth)
+        else:
+            print "Expected a .sf file, got %s" % filename
+            return
+
+    def create_energy_func(self):
+        well_distance = self.well_distance
+        well_depth = self.well_depth
+        def vdw_energy_func(X, D):
+            separation_ratio = well_distance / D
+            sr6 = separation_ratio ** 6
+            sr12 = sr6 * sr6
+            E = well_depth * (sr12 - (2 * sr6))
+            # only sum terms above diagonal to avoid double counting
+            inds = triu_indices( E.shape[0], 1 )
+            return E[inds].sum()
+        return vdw_energy_func
 
 
 class EnergyFunctionFactory(object):

@@ -1,6 +1,6 @@
 from unittest import TestCase
 from numpy import zeros, allclose, cos, sin, pi
-from ..energy import BondEnergyFactory, AngleEnergyFactory
+from ..energy import BondEnergyFactory, AngleEnergyFactory, VDWEnergyFactory
 from ..bonded_terms import BondFactory, AngleFactory
 from ..util import deg2rad
 
@@ -53,3 +53,31 @@ class TestAngleEnergy(TestCase):
         E = self.angle_energy_func(self.X, None)
         self.assertTrue( allclose(E, self.expected_E),
                          "%.2f\t%.2f" % (E, self.expected_E) )
+
+
+class TestVDWEnergy(TestCase):
+    def setUp(self):
+        well_distance = 2.6 # angstroms
+        well_depth = 0.1 # kcal/mol
+        self.expected_E = -well_depth
+
+        vdw_energy = VDWEnergyFactory()
+        vdw_energy.set_well_distance(well_distance)
+        vdw_energy.set_well_depth(well_depth)
+        self.vdw_energy_func = vdw_energy.create_energy_func()
+
+        num_atoms = 2
+        X = zeros([num_atoms,num_atoms])
+        X[0,0] = 0.0 # x1
+        X[1,0] = well_distance # x2
+        D = zeros([num_atoms,num_atoms])
+        D[0,1] = well_distance
+        D[1,0] = well_distance
+        self.X = X
+        self.D = D
+
+    def test_computes_correct_energy(self):
+        E = self.vdw_energy_func(self.X, self.D)
+        self.assertTrue( allclose(E, self.expected_E),
+                         "%.2f\t%.2f" % (E, self.expected_E) )
+  

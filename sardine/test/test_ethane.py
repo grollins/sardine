@@ -3,10 +3,13 @@ Computes normal modes for ethane.
 """
 
 from unittest import TestCase
+from os.path import exists
 from ..universe import UniverseFactory
-from ..energy import BondEnergyFactory, AngleEnergyFactory, EnergyFunctionFactory
+from ..energy import BondEnergyFactory, AngleEnergyFactory, VDWEnergyFactory,\
+                     EnergyFunctionFactory
 from ..nma import compute_hessian, compute_force_constant_matrix,\
-                  compute_normal_modes
+                  compute_normal_modes, generate_mode_trajectory
+from ..trajectory import save_trajectory_to_pdb
 
 PDB_FILENAME = "sardine/test/test_data/C2H6_ideal_trans_min_final.pdb"
 SF_FILENAME = "sardine/test/test_data/C2H6.sf"
@@ -21,17 +24,23 @@ class TestEthaneNMA(TestCase):
         bond_energy.load_bonds_from_file(SF_FILENAME)
         self.assertEqual( len(bond_energy), 7 )
         bond_energy_func = bond_energy.create_energy_func(num_atoms=len(universe))
+        self.bond_energy = bond_energy
 
         angle_energy = AngleEnergyFactory()
         angle_energy.load_angles_from_file(SF_FILENAME)
         self.assertEqual( len(angle_energy), 12 )
         angle_energy_func = angle_energy.create_energy_func()
 
+        vdw_energy = VDWEnergyFactory()
+        vdw_energy.load_vdw_from_file(SF_FILENAME)
+        vdw_energy_func = vdw_energy.create_energy_func()
+
         eff = EnergyFunctionFactory()
         eff.add_energy_term('bonds', bond_energy_func)
         eff.add_energy_term('angles', angle_energy_func)
+        eff.add_energy_term('vdw', vdw_energy_func)
         energy_func = eff.create_energy_func(
-                        ['bonds', 'angles'], num_atoms=len(universe))
+                        ['bonds', 'angles', 'vdw'], num_atoms=len(universe))
         self.universe = universe
         self.energy_func = energy_func
 
@@ -42,3 +51,9 @@ class TestEthaneNMA(TestCase):
         F = compute_force_constant_matrix(H, M)
         normal_modes = compute_normal_modes(F, discard_trans_and_rot=False)
         # print normal_modes
+        mode_trajectory = generate_mode_trajectory(self.universe, normal_modes,
+                                                   mode_number=0)
+        print len(mode_trajectory), "frames"
+        save_trajectory_to_pdb('ethane_traj_mode0.pdb', mode_trajectory,
+                               self.universe, self.bond_energy)
+        self.assertTrue( exists('ethane_traj_mode0.pdb') )
