@@ -1,0 +1,6 @@
+HEADER  triatomic molecule with stretched bonds
+HEADER
+ATOM      1    LJ   A A   1      -2.000   0.000   0.000  0.00  1.00  1.0  1.75  0.00
+ATOM      2    LJ   A A   1       0.000   0.000   0.000  0.00  1.00  1.0  1.75  0.00
+ATOM      3    LJ   A A   1       2.000   0.000   0.000  0.00  1.00  1.0  1.75  0.00
+END
