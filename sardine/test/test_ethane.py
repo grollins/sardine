@@ -8,8 +8,7 @@ from ..universe import UniverseFactory
 from ..energy import BondEnergyFactory, AngleEnergyFactory, VDWEnergyFactory,\
                      EnergyFunctionFactory
 from ..nma import compute_hessian, compute_force_constant_matrix,\
-                  compute_normal_modes, generate_mode_trajectory
-from ..trajectory import save_trajectory_to_pdb
+                  compute_normal_modes
 
 PDB_FILENAME = "sardine/test/test_data/C2H6_ideal_trans_min_final.pdb"
 SF_FILENAME = "sardine/test/test_data/C2H6.sf"
@@ -52,11 +51,3 @@ class TestEthaneNMA(TestCase):
         normal_modes = compute_normal_modes(F, discard_trans_and_rot=False)
         mode_freqs = normal_modes.get_frequencies()
         print mode_freqs
-        for i in xrange(len(mode_freqs)):
-            mode_trajectory = generate_mode_trajectory(self.universe, normal_modes,
-                                                       mode_number=i)
-            print len(mode_trajectory), "frames"
-            save_trajectory_to_pdb('ethane_traj_mode%02d.pdb' % (i+1),
-                                   mode_trajectory,
-                                   self.universe, self.bond_energy)
-            self.assertTrue( exists('ethane_traj_mode%02d.pdb' % (i+1)) )

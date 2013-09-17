@@ -73,3 +73,9 @@ class NormalModes(object):
 
     def get_amplitudes(self):
         return self.amplitudes
+
+    def freq_to_str(self):
+        freq_str = ""
+        for i, frequency in enumerate(self.frequencies):
+            freq_str += "%d\t%.1f\n" % (i, frequency)
+        return freq_str
