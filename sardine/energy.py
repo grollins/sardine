@@ -1,5 +1,5 @@
 from collections import namedtuple
-from numpy import zeros, triu_indices, seterr
+from numpy import zeros, zeros_like, triu_indices, seterr
 from .util import compute_distance_vector, compute_distance_matrix_from_vector,\
                   compute_angle
 from .parsers import StructureParser
@@ -42,12 +42,31 @@ class BondEnergyFactory(object):
             j = b.serial_num_2 - 1 # convert to 0-indexing
             K[i,j] = b.force_const
             R[i,j] = b.r_0
-
         def bond_energy_func(X, D):
             E = 0.5 * K * (D - R)**2
             return E.sum()
-
         return bond_energy_func
+
+    def create_gradient_func(self, num_atoms):
+        K = zeros([num_atoms, num_atoms])
+        R = zeros([num_atoms, num_atoms])
+        for b in self.bonds:
+            i = b.serial_num_1 - 1 # convert to 0-indexing
+            j = b.serial_num_2 - 1 # convert to 0-indexing
+            K[i,j] = b.force_const
+            R[i,j] = b.r_0
+            
+        def bond_gradient_func(X, D):
+            F = -K * (D - R)
+            G = zeros_like(X)
+            for b in self.bonds:
+                i = b.serial_num_1 - 1 # convert to 0-indexing
+                j = b.serial_num_2 - 1 # convert to 0-indexing
+                dX = (X[j,:] - X[i,:]) / D[j,i]
+                G[i,:] += F[i,j] * dX
+                G[j,:] += -F[i,j] * dX
+            return G
+        return bond_gradient_func
 
 
 class AngleEnergyFactory(object):
@@ -146,3 +165,23 @@ class EnergyFunctionFactory(object):
                 E += self.energy_terms[t](X, D)
             return E
         return energy_func
+
+
+class GradientFunctionFactory(object):
+    """docstring for GradientFunctionFactory"""
+    def __init__(self):
+        self.gradient_terms = {}
+
+    def add_gradient_term(self, term_name, term_func):
+        self.gradient_terms[term_name] = term_func
+
+    def create_gradient_func(self, term_names, num_atoms):
+        def gradient_func(X_vec):
+            X = X_vec.reshape((num_atoms, 3))
+            D_vec = compute_distance_vector(X)
+            D = compute_distance_matrix_from_vector(D_vec)
+            G = zeros_like(X)
+            for t in term_names:
+                G += self.gradient_terms[t](X,D)
+            return G.flatten()
+        return gradient_func

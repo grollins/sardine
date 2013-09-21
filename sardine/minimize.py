@@ -23,7 +23,7 @@ class BFGSMinimizer(object):
         self.maxiter = maxiter
         self.traj = None
 
-    def run_minimization(self, energy_fcn, X, num_atoms,
+    def run_minimization(self, energy_fcn, gradient_fcn, X, num_atoms,
                          save_trajectory=False, noisy=False):
         """
         Optimize parameters based on a scoring function.
@@ -48,9 +48,10 @@ class BFGSMinimizer(object):
             callback_fcn = self.make_callback_fcn(num_atoms)
             callback_fcn(X) # save initial coords to trajectory
 
-        results = fmin_bfgs(energy_fcn, x0=X, gtol=self.gtol,
-                            epsilon=self.epsilon, maxiter=self.maxiter,
-                            full_output=noisy, callback=callback_fcn)
+        results = fmin_bfgs(f=energy_fcn, fprime=gradient_fcn, x0=X,
+                            gtol=self.gtol, epsilon=self.epsilon,
+                            maxiter=self.maxiter, full_output=noisy,
+                            callback=callback_fcn)
         X_min = results[0]
         energy = results[1]
         return X_min, energy
