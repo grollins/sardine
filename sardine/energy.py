@@ -1,5 +1,6 @@
 from collections import namedtuple
-from numpy import zeros, zeros_like, triu_indices, seterr
+from numpy import zeros, zeros_like, triu_indices, seterr, dot, pi, cos
+from numpy.linalg import norm
 from .util import compute_distance_vector, compute_distance_matrix_from_vector,\
                   compute_angle
 from .parsers import StructureParser
@@ -55,7 +56,7 @@ class BondEnergyFactory(object):
             j = b.serial_num_2 - 1 # convert to 0-indexing
             K[i,j] = b.force_const
             R[i,j] = b.r_0
-            
+
         def bond_gradient_func(X, D):
             F = -K * (D - R)
             G = zeros_like(X)
@@ -107,6 +108,36 @@ class AngleEnergyFactory(object):
                 E += 0.5 * a.force_const * (theta - a.theta_0)**2
             return E.sum()
         return angle_energy_func
+
+    def create_gradient_func(self):
+        def angle_gradient_func(X, D):
+            G = zeros_like(X)
+            for a in self.angles:
+                i = a.serial_num_1 - 1 # convert to 0-indexing
+                j = a.serial_num_2 - 1 # convert to 0-indexing
+                k = a.serial_num_3 - 1 # convert to 0-indexing
+                vec12 = X[i,:] - X[j,:]
+                vec32 = X[k,:] - X[j,:]
+                theta = compute_angle(vec12, vec32)
+                total_G = a.force_const * (theta - a.theta_0)
+
+                length_vec12 = norm(vec12)
+                length_vec32 = norm(vec32)
+                vec12 /= length_vec12
+                vec32 /= length_vec32
+                cos_theta = cos(theta)
+                G1 = total_G * (vec32 - cos_theta * vec12) / length_vec12
+                G2 = total_G * (vec12 - cos_theta * vec32) / length_vec32
+                G_atom1 = -G1
+                G_atom2 = G1 + G2
+                G_atom3 = -G2
+
+                G = zeros_like(X)
+                G[i,:] = G_atom1
+                G[j,:] = G_atom2
+                G[k,:] = G_atom3
+            return G
+        return angle_gradient_func
 
 
 class VDWEnergyFactory(object):

@@ -1,5 +1,6 @@
 from .atom import AtomFactory
 from .bonded_terms import BondFactory, AngleFactory
+from .util import deg2rad
 
 class PdbParser(object):
     """
@@ -74,12 +75,13 @@ class StructureParser(object):
                     serial_num_2 = int(L[2])
                     serial_num_3 = int(L[3])
                     force_const = float(L[4])
-                    theta_0 = float(L[5])
+                    theta_0 = deg2rad( float(L[5]) )
                     this_angle = self.angle_factory.create_angle(
                                     serial_num_1=serial_num_1,
                                     serial_num_2=serial_num_2,
                                     serial_num_3=serial_num_3,
-                                    force_const=force_const, theta_0=theta_0)
+                                    force_const=force_const,
+                                    theta_0=theta_0)
                     yield this_angle
                 else:
                     continue
