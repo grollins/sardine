@@ -1,0 +1,6 @@
+HEADER  triatomic molecule with stretched angle
+HEADER
+ATOM      1    C   A A   1      -1.000   0.000   0.000  0.00  1.00  1.0  1.75  0.00
+ATOM      2    C   A A   1       0.000   0.000   0.000  0.00  1.00  1.0  1.75  0.00
+ATOM      3    C   A A   1       0.574   0.819   0.000  0.00  1.00  1.0  1.75  0.00
+END
