@@ -22,10 +22,10 @@ def universe_to_str(universe, coords):
 
 def connect_records_to_str(bond_energy):
     my_str = ""
-    for bond in bond_energy:
-        my_str += "CONNECT %d %d\n" % (bond.serial_num_1, bond.serial_num_2)
+    if bond_energy:
+        for bond in bond_energy:
+            my_str += "CONNECT %d %d\n" % (bond.serial_num_1, bond.serial_num_2)
     return my_str
-
 
 TrajectoryFrame = namedtuple("TrajectoryFrame", ['coords'])
 

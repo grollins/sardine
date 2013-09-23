@@ -177,6 +177,24 @@ class VDWEnergyFactory(object):
             return E[inds].sum()
         return vdw_energy_func
 
+    def create_gradient_func(self):
+        well_distance = self.well_distance
+        well_depth = self.well_depth
+        def vdw_gradient_func(X, D):
+            G = zeros_like(X)
+            separation_ratio = well_distance / D
+            sr6 = separation_ratio ** 6
+            sr12 = sr6 * sr6
+            # F = 12* well depth * ( (r_min^12/r^13) - (r_min^6/r^7) )
+            F = 12 * well_depth * (sr12 - sr6) / D
+            for i in xrange(X.shape[0]):
+                for j in xrange(i+1, X.shape[0]):
+                    dX = (X[j,:] - X[i,:]) / D[j,i]
+                    G[i,:] += F[i,j] * dX
+                    G[j,:] += -F[i,j] * dX
+            return G
+        return vdw_gradient_func
+
 
 class EnergyFunctionFactory(object):
     """docstring for EnergyFunctionFactory"""
