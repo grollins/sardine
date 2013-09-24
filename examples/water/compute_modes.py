@@ -11,6 +11,7 @@ from sardine.nma import compute_hessian, compute_force_constant_matrix,\
                         compute_normal_modes, generate_mode_trajectory
 from sardine.trajectory import save_trajectory_to_pdb
 from sardine.minimize import BFGSMinimizer
+from sardine.util import coords_1d_to_2d
 
 
 PDB_FILENAME = "water.pdb"
@@ -64,13 +65,14 @@ def main():
                            bond_energy_factory)
     print "Wrote minimization.pdb"
 
+    # minimization output is a flat array. convert it to (N,3) array
+    X_min = coords_1d_to_2d(X_min)
+
     # ========================
     # = Compute normal modes =
     # ========================
     M = universe.get_inv_sqrt_mass_matrix()
-    # X = universe.get_coords()
-    X = X_min # use minimized coordinates
-    H = compute_hessian(energy_func, X)
+    H = compute_hessian(energy_func, X_min)
     F = compute_force_constant_matrix(H, M)
     normal_modes = compute_normal_modes(F, discard_trans_and_rot=True)
     mode_freqs = normal_modes.get_frequencies()
@@ -79,8 +81,9 @@ def main():
         f.write("%s" % normal_modes.freq_to_str())
 
     for i in xrange(len(mode_freqs)):
-        mode_trajectory = generate_mode_trajectory(universe, normal_modes,
-                                                   mode_number=i)
+        mode_trajectory = generate_mode_trajectory(
+                            normal_modes, initial_coords=X_min,
+                            mode_number=i, peak_scale_factor=0.5)
         save_trajectory_to_pdb(
             join(OUTPUT_DIR, 'water_mode%02d.pdb') % (i+1),
             mode_trajectory, universe, bond_energy_factory)
