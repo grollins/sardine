@@ -1,5 +1,5 @@
 from collections import namedtuple
-from numpy import zeros, zeros_like, triu_indices, seterr, dot, pi, cos
+from numpy import zeros, zeros_like, triu_indices, seterr, dot, pi, cos, sin
 from numpy.linalg import norm
 from .util import compute_distance_vector, compute_distance_matrix_from_vector,\
                   compute_angle
@@ -119,7 +119,7 @@ class AngleEnergyFactory(object):
                 vec12 = X[i,:] - X[j,:]
                 vec32 = X[k,:] - X[j,:]
                 theta = compute_angle(vec12, vec32)
-                total_G = a.force_const * (theta - a.theta_0)
+                total_G = a.force_const * (theta - a.theta_0) / sin(theta)
 
                 length_vec12 = norm(vec12)
                 length_vec32 = norm(vec32)
