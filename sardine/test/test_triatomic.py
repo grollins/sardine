@@ -10,6 +10,7 @@ from ..universe import UniverseFactory
 from ..energy import BondEnergyFactory, EnergyFunctionFactory
 from ..nma import compute_hessian, compute_force_constant_matrix,\
                   compute_normal_modes
+from ..const import CM_CONVERSION_FACTOR
 
 PDB_FILENAME = "sardine/test/test_data/triatomic.pdb"
 SF_FILENAME = "sardine/test/test_data/triatomic.sf"
@@ -54,6 +55,7 @@ class TestTriatomicNMA(TestCase):
 
         expected_F = dot( dot(expected_M, expected_H), expected_M )
         self.expected_mode_freqs = array([0.0, k/m1, k*(m2+2*m1)/(m1*m2)])
+        self.expected_mode_freqs = sqrt(self.expected_mode_freqs) * CM_CONVERSION_FACTOR
         self.expected_H = expected_H
         self.expected_M = expected_M
         self.expected_F = expected_F
@@ -75,5 +77,5 @@ class TestTriatomicNMA(TestCase):
         normal_modes = compute_normal_modes(F, discard_trans_and_rot=True)
         mode_freqs = normal_modes.get_frequencies()
         print mode_freqs
-        self.assertTrue( allclose(mode_freqs, self.expected_mode_freqs),
+        self.assertTrue( allclose(mode_freqs, self.expected_mode_freqs, atol=1e-04),
                          msg="\n%s\n%s" % (mode_freqs, self.expected_mode_freqs) )

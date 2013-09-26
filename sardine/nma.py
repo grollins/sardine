@@ -1,7 +1,8 @@
-from numpy import dot, argsort, linspace, concatenate
+from numpy import dot, argsort, linspace, concatenate, sqrt
 from scipy.linalg import eig
 from numdifftools import Hessian
 from .trajectory import Trajectory
+from .const import CM_CONVERSION_FACTOR
 
 def compute_hessian(energy_func, X):
     """docstring for compute_hessian"""
@@ -52,7 +53,8 @@ def generate_mode_trajectory(universe, normal_modes, mode_number,
 class NormalModes(object):
     """docstring for NormalModes"""
     def __init__(self, eig_vals, eig_vecs, reshape_eig_vecs=True):
-        self.frequencies = list(eig_vals)
+        cm_freqs = sqrt(eig_vals) * CM_CONVERSION_FACTOR
+        self.frequencies = list(cm_freqs)
         self.amplitudes = []
         for i in xrange(eig_vecs.shape[1]):
             this_eig_vec = eig_vecs[:,i]
@@ -75,7 +77,8 @@ class NormalModes(object):
         return self.amplitudes
 
     def freq_to_str(self):
+        freqs = self.get_frequencies()
         freq_str = ""
-        for i, frequency in enumerate(self.frequencies):
+        for i, frequency in enumerate(freqs):
             freq_str += "%d\t%.1f\n" % (i, frequency)
         return freq_str
