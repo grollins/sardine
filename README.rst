@@ -8,7 +8,7 @@ sardine
 What is sardine?
 ----------------
 
-a python package for simple small molecule normal mode analysis
+A python package for simple small molecule normal mode analysis
 
 
 Installing sardine on OS X (Lion)
@@ -18,7 +18,7 @@ The instructions are based on this page_. It may be a useful reference.
 
 General dependencies:
 
-1. Install XCode and its Command Line Tools (get them in the App Store)
+1. Install XCode and its Command Line Tools (available in the App Store)
 
 2. Install Homebrew::
 
@@ -41,7 +41,7 @@ General dependencies:
 
 Python dependencies:
 
-1. Install Python2.7
+1. Install Python2.7::
 
     brew install python
 
@@ -73,7 +73,7 @@ Python dependencies:
 
     python setup.py install
 
-9. Test sardine and try examples(optional)::
+9. Test sardine and try examples (optional)::
 
     ./run_tests
     cd examples/water
