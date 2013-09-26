@@ -63,17 +63,17 @@ Python dependencies:
 
     git clone https://github.com/grollins/sardine.git
 
-7. Install dependencies via pip::
+6. Install dependencies via pip::
 
     cd sardine
     pip install numpy==1.7.1
     pip install -r stable-req.txt
 
-8. Install sardine::
+7. Install sardine::
 
     python setup.py install
 
-9. Test sardine and try examples (optional)::
+8. Test sardine and try examples (optional)::
 
     ./run_tests
     cd examples/water
