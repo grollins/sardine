@@ -8,7 +8,7 @@ sardine
 What is sardine?
 ----------------
 
-simple small molecule normal mode analysis
+a python package for simple small molecule normal mode analysis
 
 
 Installing sardine on OS X (Lion)
