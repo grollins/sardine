@@ -1,5 +1,5 @@
 """
-Computes normal modes for a triatomic molecule.
+Computes normal modes for water.
 """
 
 from os import mkdir
@@ -14,8 +14,8 @@ from sardine.minimize import BFGSMinimizer
 from sardine.util import coords_1d_to_2d
 
 
-PDB_FILENAME = "triatomic.pdb"
-SF_FILENAME = "triatomic.sf"
+PDB_FILENAME = "water.pdb"
+SF_FILENAME = "water.sf"
 OUTPUT_DIR = "modes"
 
 
@@ -32,13 +32,22 @@ def main():
     bond_energy_func = bond_energy_factory.create_energy_func(num_atoms=len(universe))
     bond_gradient_func = bond_energy_factory.create_gradient_func(num_atoms=len(universe))
 
+    angle_energy_factory = AngleEnergyFactory()
+    angle_energy_factory.load_angles_from_file(SF_FILENAME)
+    angle_energy_func = angle_energy_factory.create_energy_func()
+    angle_gradient_func = angle_energy_factory.create_gradient_func()
+
     eff = EnergyFunctionFactory()
     eff.add_energy_term('bonds', bond_energy_func)
-    energy_func = eff.create_energy_func(['bonds',], num_atoms=len(universe))
+    eff.add_energy_term('angles', angle_energy_func)
+    energy_func = eff.create_energy_func(['bonds', 'angles'],
+                                         num_atoms=len(universe))
 
     gff = GradientFunctionFactory()
     gff.add_gradient_term('bonds', bond_gradient_func)
-    gradient_func = gff.create_gradient_func(['bonds',], num_atoms=len(universe))
+    gff.add_gradient_term('angles', angle_gradient_func)
+    gradient_func = gff.create_gradient_func(['bonds', 'angles'],
+                                             num_atoms=len(universe))
 
     # ======================
     # = Minimize structure =
@@ -76,9 +85,9 @@ def main():
                             normal_modes, initial_coords=X_min,
                             mode_number=i, peak_scale_factor=0.5)
         save_trajectory_to_pdb(
-            join(OUTPUT_DIR, 'triatomic_mode%02d.pdb') % (i+1),
+            join(OUTPUT_DIR, 'water_mode%02d.pdb') % (i+1),
             mode_trajectory, universe, bond_energy_factory)
-        print "Wrote triatomic_mode%02d.pdb" % (i+1)
+        print "Wrote water_mode%02d.pdb" % (i+1)
 
 if __name__ == '__main__':
     main()

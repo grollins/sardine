@@ -28,7 +28,7 @@ def compute_normal_modes(F, discard_trans_and_rot=True):
     modes = NormalModes(eig_vals, eig_vecs)
     return modes
 
-def generate_mode_trajectory(universe, normal_modes, mode_number,
+def generate_mode_trajectory(normal_modes, initial_coords, mode_number,
                              peak_scale_factor=1.0, num_steps_per_peak=10):
     zero_to_max = linspace(0.0, peak_scale_factor, num_steps_per_peak)
     max_to_zero = linspace(peak_scale_factor, 0.0, num_steps_per_peak)[1:]
@@ -42,7 +42,6 @@ def generate_mode_trajectory(universe, normal_modes, mode_number,
     assert amplitude.shape[1] == 3, "Cartesian mode amplitude should have" \
                                     "three columns (xyz)."
 
-    initial_coords = universe.get_coords()
     for this_scale_factor in scale_factors:
         new_coords = initial_coords * (1 + this_scale_factor * amplitude)
         trajectory.add_frame(new_coords)

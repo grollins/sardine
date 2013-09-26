@@ -33,3 +33,10 @@ def deg2rad(angle):
 def rad2deg(angle):
     """docstring for rad2deg"""
     return degrees(angle)
+
+def coords_2d_to_1d(X):
+    return X.flatten()
+
+def coords_1d_to_2d(X):
+    num_atoms = len(X) / 3
+    return X.reshape((num_atoms, 3))
